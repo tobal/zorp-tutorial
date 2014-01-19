@@ -166,6 +166,13 @@ html_theme = 'default'
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'zorp_tutorial_en'
 
+##
+# Various settings to pass to templates:
+
+if os.getenv('READTHEDOCS'):
+    html_context = {
+       "disqus_shortname" : 'zorpgpltutorial',
+    }
 
 # -- Options for LaTeX output --------------------------------------------------
 
