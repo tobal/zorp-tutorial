@@ -1,5 +1,5 @@
 -------------
-Get Invlolved
+Get Involved
 -------------
 
 .. toctree::
