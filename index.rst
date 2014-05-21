@@ -5,6 +5,7 @@ Zorp GPL Tutorial
 .. toctree::
 
   introduction
+  getting_started
   simple_use_cases
   get_involved
 

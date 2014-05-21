@@ -62,6 +62,11 @@ As it has also mentioned a *Zone* can refer another *Zone* as its parent, which 
 
 If the *Zone* hierarchy above is defined and we create a *Rule* which accepts for example the *HTTP* traffic from the *Zone* ``intra`` it also accepts the *HTTP* traffic from ``intra.devel`` and ``intra.it`` and any other *Zone* will be crated in the future which defined as the child of ``intra`` independently from the fact that subnetworks of parent and child *Zone* s contains each other or not.
 
+Conflicts
+"""""""""
+
+Identical IP subnetworks -- same IP and mask pair --  cannot be added to different *Zone* explicitly (by ``addrs`` property of ``Zone`` class). It considered invalid configuration and rejected by *Zorp*.
+
 Rule
 ----
 
