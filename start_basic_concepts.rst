@@ -172,21 +172,53 @@ Service
 What service is good for?
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The *service* answers the earlier mentioned "how" question, as it determines what exactly happen with the traffic in the application layer of the *ISO*/*OSI* model. After the best matching *rule* has found, an instance of a *service* set in the *rule* starts to handle the new connection.
+The *service* answers the earlier mentioned "how" question, as it determines what exactly happens with the traffic, whether it is analyzed in the application layer of the *ISO*/*OSI* model or not, rejected or accepted. After the best matching *rule* has found, an instance of a *service* set in the *rule* starts to handle the new connection.
 
 How service works?
 ^^^^^^^^^^^^^^^^^^
 
-Minimal configuration of a *service* contains only a ``name`` and a ``proxy_class`` parameter. The ``name`` parameter is used to refer the *service* from other object (for example from a *rule*). The ``proxy_class`` parameter is the most important parameter in the point of view of a proxy firewall. The value of ``proxy_class`` parameter determines what will happen with the traffic in the application layer. 
+There are three different service types in *Zorp* with completely different functionality and configuration.
+
+``PFService``
+  Transfers packet-filter level services, so if you want to transfer connections on the packet-filter level only, and you do not want analyze application-level traffic making decisions based on it, use ``PFService``. It provides better performance, as the decision about the traffic can be made in kernel space by *KZorp*, without the assistance of the user space firewall (*Zorp*) itself.
+
+``Service``
+  Transfers application-level (*proxy*) services, so if you want to transfer connections on the application-level to make possible audit, analysis, restriction or modification, use ``Service``. It does not provide as good performance as ``PFService``, since the decision about the traffic cannot be made in kernel space (*KZorp*), it also requires the assistance of the *Zorp*, that runs in the user space, which makes deeper and also more resource-consuming operations.
+
+``DenyService``
+  .. versionadded:: 3.9.8
+    The ``DenyService`` class.
+
+  Rejects the connections in a predefined way. In general, it can be used to handle the exceptions in your policy. If you have a general rule that grants access to any *FTP* servers from any subnetwork, but you want to make an exception (for example there is a prohibited server), you can create a more specific *rule* (with the server address in ``dst_subnet`` condition) that rejects the traffic as it is set in the ``DenyService``.
 
 How service can be configured?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The mentioned minimal configuration is the following. It contains only the ``name`` and the ``proxy_class`` parameter.
+Minimal configuration of a *service* depends on its type, but at least it must contain a name. The ``name`` parameter is used to refer to the *service* from another object (for example from a *rule*).
 
-.. code-block:: python
+``PFService``
+  With the defaults of the additional parameters, ``PFService`` transfers the traffic through the firewall in the packet-filter level without passing it to the user space (just like in *Netfilter*).
 
-  Service(name='service_http', proxy_class=HttpProxy)
+  .. code-block:: python
+
+    PFService(name='PFService')
+
+``Service``
+  In case of ``Service``, the ``proxy_class`` parameter is also mandatory. This is the most important parameter in the point of view of a proxy firewall, while its value determines what will happen with the traffic in the application layer.
+
+  .. code-block:: python
+
+    Service(name='Service', proxy_class=HttpProxy)
+
+``DenyService``
+  .. versionadded:: 3.9.8
+    The ``DenyService`` class.
+
+  With the defaults of the additional parameters, ``DenyService`` drops the traffic silently (just like ``DROP`` target in *Netfilter*).
+
+  .. code-block:: python
+
+    DenyService(name='DenyService')
 
 Proxy
 -----
