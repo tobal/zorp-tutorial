@@ -56,3 +56,96 @@ Table name ``tproxy`` can be used only if the following line is added to ``rt_ta
 
 .. note::
   The policy routing rules above must be repeated with options ``-6`` instead of ``-4`` to make IPv6 operable.
+
+Zorp
+====
+
+Kernel Module
+-------------
+
+As it is possible to use *kZorp* separately from *Zorp* using your *zones* in your IPTables rule set by *zone match* without *Zorp*. As the *zones* handled by the *kZorp* they must be downloaded to the kernel space. The init script of the ``iptables.utils`` does this by reading the *zone* descriptions from the file ``/etc/iptables.zones``. The syntax of the configuration file is the following.
+
+.. code-block:: bash
+
+  "intra";;10.0.0.0/8,fec0::/16
+  "intra.devel";"intra";10.1.0.0/16,fec0:1::/24
+  "intra.it";"intra";10.2.0.0/16,fec0:2::/24
+
+If you do not use *zone match* in your IPTables rules this file can be omitted *Zorp* are going to download *zones* to *kZorp*.
+
+The configuration of the application level firewall itself has two completely different approaches.
+
+#. configuration of the firewall application
+#. description of the network security policy
+
+Zorp Instance
+-------------
+
+As it has already mentioned parameters of the firewall application instances are stored in the configuration file named ``/etc/zorp/instances.conf``. It must exist, but can be empty, but practically the minimal configuration should contain at least one *Zorp* *instance* descriptions in order to make it possible being to run a *Zorp* process.
+
+.. literalinclude:: configs/minimal_instances.conf
+  :language: bash
+
+If you do not have performance or debugging issues it is fair enough for smaller size configurations.
+
+Network Security Policy
+-----------------------
+
+A *Zorp* policy contains same number of instance definition that has been declared in the configuration file ``instances.conf``. Practically it means at least one definitions as you can see in the following example.
+
+.. literalinclude:: configs/minimal_policy.py
+  :language: python
+  :emphasize-lines: 3,5,7
+
+[Minimal *Zorp* policy]
+
+1. The ``Zorp.Core`` module contains the import of the mandatory classes (for example ``Rule``, ``Service``) so it must be imported.
+2. Every *instance* represented as a Python function in the ``policy.py`` where the name of the function is the name of the corresponding *instance*. The function must not have any arguments.
+3. In Python the ``pass`` does nothing. It can be used when a statement is required syntactically but the program requires no action. In this minimal case there is no definition (for example ``Service``) relates to our *instance*, so ``pass`` is used to indicate that fact.
+
+This configuration result a running *Zorp* instance which does absolutely nothing considering the fact that there is no *rule* in the instance, so there is no *service* which can be launched. The trivial question arises as whether the ongoing traffic will be accepted or dropped. It depends on your IPTables rule set as the *kZorp* does not know what to do with the traffic so it does nothing with the traffic, neither accept nor drop it.
+
+.. caution::
+
+  There is two possible result of jumping to the ``KZORP`` target from IPTables.
+
+  a. there is *rule* which matches to the traffic, so the packet will be
+
+   * accepted if the *service* class is a ``PFService`` or ``Service``
+
+   * rejected if  *service* class is ``DenyService``
+
+  b. there is no *rule* matching to the traffic, so traffic will be accepted
+
+  where
+
+  * accept means that the packet will be put back right after the IPTables rule jumped to ``KZORP`` target and will be handled by one of the IPTables rules in the chain or the default policy
+  * reject means that that the IPTables rule jumped to ``KZORP`` cause ``DROP`` or ``REJECT`` depending on the settings of the ``DenyService``
+
+However there is no policy in the semantics of *Zorp* as it is in IPTables, a *rule* without any conditions always matches worst (see also) and it will be evaluated only when there is no other *rule* that matches better, so you can regard it as default.
+
+To implement something like the ``DROP`` policy means in an IPTables chain, you should add a *rule* without any condition and ``DenyService`` as a *service*. You can also implement the ``REJECT`` IPTables policy if you change the necessary settings in the ``DenyService`` from ``DROP`` to ``REJECT``.
+
+.. literalinclude:: configs/drop_all_policy.py
+  :language: python
+
+[Default drop *rule* in a *Zorp* policy]
+
+Default accept can be easily implement by changing the ``DenyService`` to a ``PFService`` as it forwards the traffic just like the IPTables would do it.
+
+.. note::
+
+  Theres is need to add this kind of default rule if your IPTables policy is ``DROP`` or ``REJECT`` as it is suggested.
+
+.. caution::
+
+  If you use this method there is not possible do anithing with the packet (for example log) in the IPTables as it is dropped or rejected.
+
+.. literalinclude:: configs/accept_all_policy.py
+  :language: python
+
+[Default accept *rule* in a *Zorp* policy]
+
+.. caution::
+
+  It is not recommended to use this method for the same reason as it is not recommended in case of IPTables.
