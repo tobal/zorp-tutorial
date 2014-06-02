@@ -31,16 +31,26 @@ How Zone can be configured?
 
 The simplest way to define a *Zone* to write the followings to the configuration file ``policy.py``. It defines an empty *Zone*, which has not contain any subnetwork, but can be referred from the firewall rules by its name ``zone``. Obviously it is not so useful, but it is simple as we promised.
 
-.. code-block:: python
+.. versionchanged:: 5.0
+   Definitions of the *zones* moved to a separate configuration file named ``zones.py``
 
-  Zone('zone')
+.. literalinclude:: configs/intranet_zones.py
+  :language: python
 
 As it has already mentioned a *Zone* groups the administratively belonging IP subnetworks together, so we have to define these subnetworks somehow to give meaning to the *Zone*. It can be done by creating the ``Zone`` class with additional ``addrs`` parameter, which value must be an iterable object, which contains IP subnetworks in CIDR notation.
 
+.. literalinclude:: configs/intranet_zones.py
+  :language: python
+
+.. versionadded:: 5.0
+   The ``hostnames`` parameter.
+
+Addresses can also be added to a *Zone* by hostnames. It practically means that each and every address cab resolved from the hostname (both IPv4 and IPv6 addresses) is added to the *Zone* initially and updated periodically by *Zorp*.
+
 .. code-block:: python
 
-  Zone(name='intra.devel', addrs=['10.1.0.0/16', 'fec0:1::/24'])
-  Zone(name='intra.it',    addrs=['10.2.0.0/16', 'fec0:2::/24'])
+  Zone(name='internet.cloud.facebook', hostnames=['www.facebook.com', ])
+  Zone(name='internet.cloud.gmail',    hostnames=['imap.gmail.com', 'smtp.gmail.com'])
 
 How Zone works?
 ^^^^^^^^^^^^^^^
@@ -66,6 +76,19 @@ Conflicts
 """""""""
 
 Identical IP subnetworks -- same IP and mask pair --  cannot be added to different *Zone* explicitly (by ``addrs`` property of ``Zone`` class). It considered invalid configuration and rejected by *Zorp*.
+
+.. versionadded:: 5.0
+   The ``hostnames`` parameter.
+
+There are two other cases when subnetworks may conflict with each other. An implicitly added (by ``hostnames`` property of ``Zone`` class) subnetwork may conflicts with
+
+ #. an explicitly added subnetwork (for example ``google-public-dns-a.google.com`` conflicts with ``8.8.8.8``)
+ #. another implicitly added subnetwork (for example ``gmail.com`` conflicts with ``smtp.gmail.com``)
+
+As these kind of conflicts may occur not only at startup, but any any time after it, when IP address relates to a hostname changing, the conflict itself handled just in time using the following method
+
+ #. as there is an explicitly added subnetwork the conflicting IP address is ignored at the *Zone* where the hostname resolving to it is given
+ #. es there is no explicitly added subnetwork both IP addresses are ignored at both of the *Zones* where the hostnames resolving to it are given
 
 Rule
 ----

@@ -73,6 +73,11 @@ As it is possible to use *kZorp* separately from *Zorp* using your *zones* in yo
 
 If you do not use *zone match* in your IPTables rules this file can be omitted *Zorp* are going to download *zones* to *kZorp*.
 
+.. versionadded:: 5.0
+   The ``zones.py`` file.
+
+Definition of *zones* moved to a separate file named ``/etc/zorp/zones.py`` and handled by a standalone daemon which downloads them to *kZorp*. If you don't use *zones* neither in your IPTables rule set nor in your *Zorp* policy the configuration file can be omitted. The syntax of the configuration file is the same as it has been mentioned Zone section (see also).
+
 The configuration of the application level firewall itself has two completely different approaches.
 
 #. configuration of the firewall application
