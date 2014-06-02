@@ -77,7 +77,7 @@ What Rule is good for?
 
 There is no firewall without access control and *Zorp* is no exception to this rule. When an access control policy is being created, we first have to find answers to the "who", "what" and "how" - questions. Resources should be accessible only for a specific group of users under the defined conditions.
 
-How Zone works?
+How Rule works?
 ^^^^^^^^^^^^^^^
 
 The *Rule* answers to the "who", "what" and indirectly the "how" questions.
