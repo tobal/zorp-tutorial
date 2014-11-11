@@ -18,9 +18,9 @@ The application level solution of the problem is enforcing the *HTTP* protocol o
   :language: python
   :emphasize-lines: 1,4,7
 
-1. Imports anything from the \texttt{Zorp.Http} module, which makes it possible to use *HttpProxy*-related names without any prefix.
+1. Imports anything from the \text{Zorp.Http} module, which makes it possible to use *HttpProxy*-related names without any prefix.
 2. Creates a simple *service* with the name ``service_http_transparent``, which uses the predefined ``HttpProxy`` of *Zorp*.
-3. Creates a *rule* with the necessary conditions, traffic from *zone* ``clients`` to *Zone* ``servers`` targets the port 80 and starts a *service* named ``service_http_transparent``.
+3. Creates a *rule* with the necessary conditions, traffic from *zone* ``clients`` to *Zone* ``servers``, targets the port 80 and starts a *service* named ``service_http_transparent``.
 
 Result
 ======

@@ -47,9 +47,9 @@ At least the following *IPTables* ruleset is required for *Zorp*. Note that this
 
 [*KZorp* related *IPTables* rules]
 
-1. The ``socket`` matcher inspects the traffic by performing a socket lookup on the packet (non-transparent sockets are not counted) and checks if an open socket can be found. It practically means that *Zorp* (or any other application) has a socket for the traffic, it is already handled by *Zorp* in the userspace, no kernel-level intervention is required. In this case it is marked with the *TProxy mark* value (``0x80000000``), meaning that it should be handled by *Zorp*.
-2. There are some chains of table ``mangle`` where *KZorp* must be hooked for certain purposes (rule evaluation, NAT handling, ...). In these cases we are jumping to a user-defined chain (``DIVERT``) where the corresponding rules can placed to pass the traffic to *KZorp* or even bypass it.
-3. This is the place where we can put rules which match to certain traffic should be hidden from *KZorp* and accept it.
+1. The ``socket`` matcher inspects the traffic by performing a socket lookup on the packet (non-transparent sockets are not counted) and checks if an open socket can be found. It practically means that if *Zorp* (or any other application) has a socket for the traffic, it is already handled by *Zorp* in the userspace, no kernel-level intervention is required. In this case it is marked with the *TProxy mark* value (``0x80000000``), meaning that it should be handled by *Zorp*.
+2. There are some chains of table ``mangle`` where *KZorp* must be hooked for certain purposes (rule evaluation, NAT handling, ...). In these cases we are jumping to a user-defined chain (``DIVERT``) where the corresponding rules can be placed to pass the traffic to *KZorp* or even bypass it.
+3. This is the place where we can put rules which match to certain traffic, that should be hidden from *KZorp* and accepted.
 4. If no rule has been matched in this chain earlier, this rule jumps to *KZorp* and also marks the packet. This mark can be used in policy routing rules to divert traffic locally to *Zorp* instead of forwarding it to its original address. Note that this mark is the same that we use in case of the first rule of the ``PREROUTING`` chain.
 5. If the traffic has already been marked in table ``mangle`` with the corresponding value (``0x80000000``), we should accept it. For example the data channel connection of active mode FTP matches the first rule of ``mangle`` table ``PREROUTING`` chain, so it has been marked, but should be accepted in the ``INPUT`` chain of ``filter`` table as it is an incoming connection.
 6. The ``service`` matcher looks up services specified within *KZorp*. Services can be identified by name or by type. Type ``forward`` means a forwarded session (or *PFService*). These kind of sessions should be forwarded in the ``FORWARD`` chain of the ``filter`` table.
@@ -63,7 +63,7 @@ At least the following *IPTables* ruleset is required for *Zorp*. Note that this
 Advanced Routing
 ----------------
 
-Packets have been marked to a certain value in *IPTables*. Now match on that value using policy routing to have those packets delivered locally to *Zorp* instead of forwarding it to the original address, and *Zorp* will connect to a server depending on the policy.
+Packets have been marked with a certain value in *IPTables*. Now match on that value using policy routing to have those packets delivered locally to *Zorp* instead of forwarding it to the original address, and *Zorp* will connect to a server depending on the policy.
 
 .. literalinclude:: configs/rc.local
   :language: none

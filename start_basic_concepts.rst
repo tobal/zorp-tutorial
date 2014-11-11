@@ -18,24 +18,24 @@ Usually access to the services controlled by the attributes of lower layers of t
 Administrative Hierarchy
 """"""""""""""""""""""""
 
-*Zones* group IP subnetworks that administratively belong together. What is it good for? In this way an administrative hierarchy can be created that is independent from the network topology, reflecting only the network policy. Imagine the situation when all those who are permitted to access an *FTP* servers for upload not belongs to the same IP subnet. In this case we would have to add at least two IP based rules to our network policy. If we use *Zorp* we only have to add necessary IP subnetworks to the necessary *zone*.
+*Zones* group IP subnetworks that administratively belong together. What is it good for? In this way an administrative hierarchy can be created that is independent from the network topology, reflecting only the network policy. Imagine the situation when all those who are permitted to access an *FTP* server to upload, does not belong to the same IP subnet. In this case we would have to add at least two IP based rules to our network policy. If we use *Zorp* we only have to add the necessary IP subnetworks to the necessary *zone*.
 
 Inheritable Rights
 """"""""""""""""""
 .. index:: single: protocol;FTP
 
-Other notable feature of zones, that they can be linked to a tree hierarchy. Access control rights are inherited between the levels of the *zone* tree. A top-level access is in effect in the lower levels as long as it is not blocked. For instance a top-level access can be the right to download from *FTP* servers. When a group of users should have special rights. These special rights can be granted in the lower levels of the *zone* tree.
+Other notable feature of zones is that they can be linked to a tree hierarchy. Access control rights are inherited between the levels of the *zone* tree. A top-level access is in effect in the lower levels as long as it is not blocked. For instance a top-level access can be the right to download from *FTP* servers. When a group of users should have special rights, these special rights can be granted in the lower levels of the *zone* tree.
 
 How Zone can be configured?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The simplest way to define a *Zone* to write the followings to the configuration file ``policy.py``. It defines an empty *Zone*, which has not contain any subnetwork, but can be referred from the firewall rules by its name ``zone``. Obviously it is not so useful, but it is simple as we promised.
+The simplest way to define a *Zone* is to write the following into the configuration file ``policy.py``. It defines an empty *Zone*, which does not contain any subnetwork, but can be referred from the firewall rules by its name ``zone``. Obviously it is not so useful, but it is simple as we promised.
 
 .. code-block:: python
 
   Zone('zone')
 
-As it has already mentioned a *Zone* groups the administratively belonging IP subnetworks together, so we have to define these subnetworks somehow to give meaning to the *Zone*. It can be done by creating the ``Zone`` class with additional ``addrs`` parameter, which value must be an iterable object, which contains IP subnetworks in CIDR notation.
+As mentioned before, a *Zone* groups the administratively belonging IP subnetworks together, so we have to define these subnetworks somehow to give meaning to the *Zone*. It can be done by creating the ``Zone`` class with the additional ``addrs`` parameter. It's value must be an iterable object, which contains IP subnetworks in CIDR notation.
 
 .. code-block:: python
 
@@ -48,7 +48,7 @@ How Zone works?
 Inheritance
 """""""""""
 
-As it has also mentioned a *Zone* can refer another *Zone* as its parent, which makes possible to create a tree from the *Zone* s. This tree represents the administrative hierarchy of our network. When a *Rule* refers to a parent *Zone* in the hierarchy it implicitly refers to the whole subtree. It practically means that we accept a special kind of traffic in a parent *Zone* it will be accepted all of its child *Zone* s also.
+As it has also been mentioned, a *Zone* can refer another *Zone* as its parent, which makes possible to create a tree from the *Zone* s. This tree represents the administrative hierarchy of our network. When a *Rule* refers to a parent *Zone* in the hierarchy it implicitly refers to the whole subtree. It practically means that if we accept a special kind of traffic in a parent *Zone*, it will be accepted in all of its child *Zone* s too.
 
 .. code-block:: python
 
@@ -60,12 +60,12 @@ As it has also mentioned a *Zone* can refer another *Zone* as its parent, which 
   Zone(name='intra.it',    admin_parent='intra',
        addrs=['10.2.0.0/16', 'fec0:2::/24'])
 
-If the *Zone* hierarchy above is defined and we create a *Rule* which accepts for example the *HTTP* traffic from the *Zone* ``intra`` it also accepts the *HTTP* traffic from ``intra.devel`` and ``intra.it`` and any other *Zone* will be crated in the future which defined as the child of ``intra`` independently from the fact that subnetworks of parent and child *Zone* s contains each other or not.
+If the *Zone* hierarchy above is defined and we create a *Rule* which accepts for example the *HTTP* traffic from the *Zone* ``intra``, it also accepts the *HTTP* traffic from ``intra.devel`` and ``intra.it``, and any other *Zone* which will be crated in the future defined as the child of ``intra``, independently from the fact that subnetworks of parent and child *Zone* s contains each other or not.
 
 Conflicts
 """""""""
 
-Identical IP subnetworks -- same IP and mask pair --  cannot be added to different *Zone* explicitly (by ``addrs`` property of ``Zone`` class). It considered invalid configuration and rejected by *Zorp*.
+Identical IP subnetworks -- same IP and mask pair --  cannot be added to different *Zone* s explicitly (by ``addrs`` property of ``Zone`` class). It is considered as invalid configuration and will be rejected by *Zorp*.
 
 Rule
 ----
@@ -80,7 +80,7 @@ There is no firewall without access control and *Zorp* is no exception to this r
 How Rule works?
 ^^^^^^^^^^^^^^^
 
-The *Rule* answers to the "who", "what" and indirectly the "how" questions.
+The *Rule* answers the "who", "what" and indirectly the "how" questions.
 
 Who and What?
 """""""""""""
@@ -92,7 +92,7 @@ The "who" and the "what" questions can be answered by a set of traffic propertie
   Rule(service='service_dns',
        dst_port=53)
 
-In the example above the *Rule* matches to any kind of traffic which target the port destination 53. In other words it grants access to any name server on the internet. It works only when protocol is *TCP* or *UDP*, because port is not defined in case of other protocols (for example *IGRP*), but we can add another conditions to the *Rule* to make the rule definite.
+In the example above the *Rule* matches to any kind of traffic which target the destination port 53. In other words it grants access to any name server on the internet. It works only when protocol is *TCP* or *UDP*, because port is not defined in case of other protocols (for example *IGRP*), but we can add other conditions to the *Rule* to make the rule definite.
 
 .. _complex rule example:
 .. code-block:: python
@@ -107,7 +107,7 @@ As it can be seen multiple conditions can be defined, so the "who" and the "what
 Conditions
 """"""""""
 
-First of all list the possible conditions parameters of a *Rule*. As you can see there are 8 different type of conditions, which can be set independently from each other. If more than one condition is given the rule matches only if the logical conjunction of the conditions matches. If there is more than one value in a specific condition there is logical disjunction between them.
+First of all list the possible condition parameters of a *Rule*. As you can see there are 8 different types of conditions, which can be set independently from each other. If more than one condition is given the rule matches only if the logical conjunction of the conditions matches. If there is more than one value in a specific condition there is logical disjunction between them.
 
 .. _condition list:
 
@@ -133,12 +133,12 @@ Best match
 
 In contrast to the *Netfilter* where the first matching rule takes effect, in case of *Zorp* the best matching rule takes effect. It entails that the order of the rules is irrelevant. When a new connection is occurred the evaluation will check each rule against the parameters of the traffic to find the best one.
 
-The word best in the expression *best match* means that the more accurate rule will take affect. The accuracy of a *Rule* depends on two thing, the evaluation order of the conditions and the accuracy of the specific condition in the *Rule*.
+The word best in the expression *best match* means that the more accurate rule will take affect. The accuracy of a *Rule* depends on two things: the evaluation order of the conditions and the accuracy of the specific condition in the *Rule*.
 
 Evaluation order
-  There is a precedence between the different condition types, which determines the order of the evaluation. It means if a rule has a condition with higher precedence it considers better that the other one. The `condition list`_ enumerates over the conditions in top to bottom in descending precedence. It practically means that a rule with a destination subnetwork condition is always better than a rule with destination *zone* condition and both of them are worse than a rule with a source *zone* condition and so on ...
+  There is a precedence between the different condition types, which determines the order of the evaluation. It means if a rule has a condition with higher precedence, it is considered as better that the other one. The `condition list`_ enumerates over the conditions in top to bottom in descending precedence. It practically means that a rule with a destination subnetwork condition is always better than a rule with destination *zone* condition and both of them are worse than a rule with a source *zone* condition and so on ...
 Condition scope
-  If two rule are considered to be identical -- in other words they have conditions with the same precedence -- the value of the conditions determines which one considered to be better. In general a narrower is always better than a wide scope, which means an IP subnetwork with greater prefix value, a port number instead of a port range, a child *zone* instead of a parent is more specific, so the rule with it is considered better.
+  If two rules are considered to be identical -- in other words they have conditions with the same precedence -- the value of the conditions determines which one is considered to be better. In general a narrower is always better than a wide scope, which means an IP subnetwork with greater prefix value, a port number instead of a port range, a child *zone* instead of a parent is more specific, so the rule with it is considered better.
 
 How Rule can be configured?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -160,11 +160,11 @@ First of all solve the general requirement, which is the read-only access to any
        src_subnet='10.10.0.0/16',
        dst_port=21)
 
-The second requirement was to grant read-write access to a specific server (``1.2.3.4``). It can be done by a *rule* matches "better" to the traffic than the previous one. As the second rule has a condition to the destination subnetwork (``dst_subnet``), while the first one has not, it considered to more specific, so it is a "better" match.
+The second requirement was to grant read-write access to a specific server (``1.2.3.4``). It can be done by a *rule* which matches "better" to the traffic than the previous one. As the second rule has a condition to the destination subnetwork (``dst_subnet``), while the first one has not, it is considered to be more specific, so it is a "better" match.
 
 The third requirement was to grant read-write access for a department (``10.10.0.0/16``) of our organization to any *FTP* server. It is also possible by adding a new *rule* with a condition to the source subnetwork (``src_subnet``) with the necessary value (``10.10.0.0/16``).
 
-The question arises, what is the *best match* to a traffic which comes from the subnetwork ``10.10.0.0/16`` and its destination is the address ``1.2.3.4``, as in this case each *rule* matches. As we have already mentioned the second and the third one more specific than the first, so the first one cannot be the bast match. Inasmuch source subnetwork condition has higher precedence than the destination subnetwork the second *rule* will be the *best match*.
+The question arises, what is the *best match* to a traffic which comes from the subnetwork ``10.10.0.0/16`` and its destination is the address ``1.2.3.4``, as in this case each *rule* matches. As we have already mentioned the second and the third one is more specific than the first, so the first one cannot be the best match. As the source subnetwork condition has higher precedence than the destination subnetwork, the second *rule* will be the *best match*.
 
 Service
 -------
@@ -172,7 +172,7 @@ Service
 What service is good for?
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The *service* answers the earlier mentioned "how" question, as it determines what exactly happens with the traffic, whether it is analyzed in the application layer of the *ISO*/*OSI* model or not, rejected or accepted. After the best matching *rule* has found, an instance of a *service* set in the *rule* starts to handle the new connection.
+The *service* answers the earlier mentioned "how" question, as it determines what exactly happens with the traffic, whether it is analyzed in the application layer of the *ISO*/*OSI* model or not, rejected or accepted. After the best matching *rule* was found, an instance of a *service* set in the *rule* starts to handle the new connection.
 
 How service works?
 ^^^^^^^^^^^^^^^^^^
@@ -204,7 +204,7 @@ Minimal configuration of a *service* depends on its type, but at least it must c
     PFService(name='PFService')
 
 ``Service``
-  In case of ``Service``, the ``proxy_class`` parameter is also mandatory. This is the most important parameter in the point of view of a proxy firewall, while its value determines what will happen with the traffic in the application layer.
+  In case of ``Service``, the ``proxy_class`` parameter is also mandatory. This is the most important parameter in the point of view of a proxy firewall, since it's value determines what will happen with the traffic in the application layer.
 
   .. code-block:: python
 
@@ -228,7 +228,7 @@ As it has already been mentioned earlier the network traffic analysis can take p
 What proxy is good for?
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-Any kind of application level protocol analysis, restriction, modification can be done by *proxy*.
+Any kind of application level protocol analysis, restriction, modification can be done by a *proxy*.
 
 How proxy works?
 ^^^^^^^^^^^^^^^^
@@ -252,12 +252,12 @@ Predefined proxies
 .. index:: single: proxy;AnyPy
 
 ``AnyPy``
-  It is a simple proxy like the *Plug* proxy with a *Python* interface. It makes it possible to do anything with the application level network traffic which can be done by the help of the *Python* language, while the lower layers of the connection is handled by *Zorp*. For instance if the proxy to our favorite protocol is not implemented yet in *Zorp* we have the possibility to perform application level analysis manually.
+  It is a simple proxy like the *Plug* proxy with a *Python* interface. It makes it possible to do anything with the application level network traffic which can be done with the help of *Python* language, while the lower layers of the connection is handled by *Zorp*. For instance if the proxy to our favorite protocol is not implemented yet in *Zorp* we have the possibility to perform application level analysis manually.
 
 Proxy Inheritance
 """""""""""""""""
 
-As it is mentioned each proxy is configurabe and extendable in *Python*. It means each proxy represented as a class in *Python* and the system administrator can inherit his own *Python* class from that to override the behavior of the parent class. A derived class inherits everything from the base class, which is necessary for the protocol analysis, so the system administrator has to care about his specific problem. For instance to change a value of a header in the *HTTP* protocol needs only an extra line of code over the lines related to the *Python* inheritance mechanism.
+As it is mentioned each proxy is configurabe and extendable using *Python*. To help this, each proxy is represented as a class in *Python* and the system administrator can inherit his own *Python* class from that to override the behavior of the parent class. A derived class inherits everything from the base class, which is necessary for the protocol analysis, so the system administrator only has to care about his specific problem. For instance to change a value of a header in the *HTTP* protocol needs only an extra line of code over the lines related to the *Python* inheritance mechanism.
 
 General SSL Handling
 """"""""""""""""""""
@@ -271,10 +271,10 @@ Program stacking
 
 *Zorp* is a proxy firewall, neither more nor less, but can be used to do tasks other than protocol analysis, such as virus scanning or spam filtering by integrating it with external applications. For instance in case of the *HTTP* protocol *Zorp* can forward responses to a virus scanner software. After that depending on the result of the scan *Zorp* can accept or reject the original request.
 
-How proxy can be configured?
+How a proxy can be configured?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-*Zorp* *proxy* classes can be implemented or customized in *Python* language. As the following example show the only thing we have to do is deriving a new class from the necessary base class (``HttpProxy``) and customizing its behaviour.
+*Zorp* *proxy* classes can be implemented or customized in *Python* language. As the following example show the only thing we have to do is deriving a new class from the necessary base class (``HttpProxy``) and customizing it's behaviour.
 
 .. code-block:: python
 
@@ -286,4 +286,4 @@ How proxy can be configured?
           self.request_header["User-Agent"] = (HTTP_HDR_CHANGE_VALUE,
                                                "Forged Browser 1.0")
 
-The example above only a demonstration of a customization, it is uncommented now, we will back to later.
+The example above is only a demonstration of a customization, it is uncommented now, we will get back to it in a later section.

@@ -23,7 +23,7 @@ The communication can be inspected on the protocol level, since the *SMTP* proxy
   :language: python
   :emphasize-lines: 4,6,8
 
-1. This case is similar than it was at the *HTTP* forward proxy code sniplet, the clients connect to the firewall directly, so the destination IP address is the firewall's address (``172.16.40.1``) and the port is the standard port of *SMTP* (``25``).
+1. This case is similar to the *HTTP* forward proxy code sniplet, the clients connect to the firewall directly, so the destination IP address is the firewall's address (``172.16.40.1``) and the port is the standard port of *SMTP* (``25``).
 2. The service uses the predefined ``SmtpProxy`` proxyclass to enforce the *SMTP* protocol.
 3. As the clients target the firewall, the traffic must be routed to the origin server (``172.16.20.254``) directly. As its name shows, this function can be solved by the ``DirectedRouter`` class, where the ``dest_addr`` parameter contains the address and the port value of the origin server.
 
@@ -35,7 +35,7 @@ There is another relevant question in case of a *forward proxy*. As the firewall
                         forge_addr=TRUE
                        )
 
-The ``forge_addr`` and ``forg_port`` options of the *router* can be used to forge the client address and port to the traffic instead of the firewall's ones.
+The ``forge_addr`` and ``forge_port`` options of the *router* can be used to forge the client address and port to the traffic instead of the firewall's ones.
 
 Result
 ======
